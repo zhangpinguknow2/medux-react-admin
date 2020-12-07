@@ -10,6 +10,12 @@ module.exports = {
   },
   rules: {
     //'global-require': 'off',
+    "sort-imports": ["error", {
+      "ignoreCase": true,
+      "ignoreDeclarationSort": false,
+      "ignoreMemberSort": false,
+      "memberSyntaxSortOrder": ["all", "multiple", "single","none",]
+  }],
   },
   ignorePatterns: [],
 };
