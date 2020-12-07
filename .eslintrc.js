@@ -12,10 +12,10 @@ module.exports = {
     'global-require': 'off',
     "sort-imports": ["error", {
       "ignoreCase": true,
-      "ignoreDeclarationSort": false,
-      "ignoreMemberSort": false,
+      "ignoreDeclarationSort": true,
+      "ignoreMemberSort": true,
       "memberSyntaxSortOrder": ["all", "multiple", "single","none",]
-  }],
+    }]
   },
   ignorePatterns: ['/src','/dist','/mock'],
 };
