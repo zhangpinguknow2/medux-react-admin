@@ -1,5 +1,5 @@
-import { Button, Descriptions, Form, Input } from 'antd';
-import { DGender, DStatus, ItemDetail } from 'entity/member';
+import { Button, Descriptions, Form, Input, Select } from 'antd';
+import { DGender, ItemDetail } from 'entity/member';
 import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
 import React, { useCallback } from 'react';
 
@@ -8,18 +8,22 @@ import { connect } from 'react-redux';
 import { getFormDecorators } from 'common/utils';
 import styles from './index.m.less';
 import useDetail from 'hooks/useDetail';
+import { enumOptions } from 'common/utils';
 
-export enum Status {
+const Option = Select.Option;
+enum Status {
   '启用' = 'enable',
   '禁用' = 'disable',
 }
+const DStatus = enumOptions(Status);
+console.log(8888, DStatus)
 interface SearchRequest {
   username?: string;
   nickname?: string;
   // role?: { id: string; name: string };
   // roleId?: string;
   // email?: string;
-  // status?: Status;
+  status?: Status;
 }
 type FormData = Required<SearchRequest>;
 const initialValues: Partial<FormData> = {
@@ -42,6 +46,15 @@ const Component: React.FC<DispatchProp> = ({ dispatch }) => {
         </Form.Item>
         <Form.Item name="nickname" label="呢称">
           <Input size="large" allowClear placeholder="请输入呢称" />
+        </Form.Item>
+        <Form.Item name="status" label="状态">
+          <Select allowClear placeholder="请选择用户状态">
+            {DStatus.options.map((option) => (
+              <Option key={option.key} value={option.key}>
+                {option.name}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <div className="btns">
           <Button type="primary" htmlType="submit">

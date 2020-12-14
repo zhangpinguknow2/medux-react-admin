@@ -87,6 +87,7 @@ export function enumOptions<T extends {[key: string]: any}>(data: T) {
     (nameToKey as any)[name] = data[name];
     keyToName[data[name]] = name;
   });
+  console.log(999,keyToName,nameToKey,options)
   return {
     keyToName,
     nameToKey,
