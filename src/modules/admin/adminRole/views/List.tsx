@@ -11,6 +11,7 @@ import useDetail from 'hooks/useDetail';
 import { enumOptions } from 'common/utils';
 import debounce from 'lodash/debounce';
 const { Option, OptGroup } = Select;
+import api from '../api';
 enum Status {
   '启用' = 'enable',
   '禁用' = 'disable',
@@ -40,39 +41,55 @@ const initialValues: Partial<FormData> = {
 const Component: React.FC<DispatchProp> = ({ dispatch }) => {
   const [form] = Form.useForm();
   const [items, setItems] = useState<{ term: string; list: any[]; listSummary: BaseListSummary }>();
-  const [fetching, setFetching] = useState(false)
-  const [pageSize, setPageSize] = useState(10)
-  const [limit, setLimit] = useState(1)
-  const [lastFetchId, setLastFetchId] = useState(0)
+  const [fetching, setFetching] = useState<boolean>(false)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [limit, setLimit] = useState<number>(1)
+  const [lastFetchId, setLastFetchId] = useState<number>(0)
   useEffect(() => {
-
+    fetch = debounce(fetch, 1000);
+    popupScroll = debounce(popupScroll, 300);
   }, []);
-  const fetch = (term: string, pageCurrent = 1) => {
-    this.lastFetchId += 1;
-    const fetchId = this.lastFetchId;
-    const pageSize = this.props.pageSize || 10;
-    this.props
-      .fetch(term, pageSize, pageCurrent)
-      .catch(() => {
-        return null;
-      })
-      .then((result) => {
-        if (fetchId !== this.lastFetchId) {
+  let fetch = (term: string, pageCurrent: number = 1) => {
+    alert(2)
+    console.log(6666, term, pageSize, pageCurrent)
+    let tempFetchId = lastFetchId + 1;
+    setLastFetchId(tempFetchId)
+    const fetchId = lastFetchId;
+    useCallback((term, pageSize, pageCurrent) => {
+      api.searchList({ term, pageSize, pageCurrent }).then((result) => {
+        if (fetchId !== lastFetchId) {
           return;
         }
-        let items: { term: string; list: Resource[]; listSummary: BaseListSummary };
         if (result) {
-          if (pageCurrent > 1 && this.state.items) {
-            items = { ...result, list: [...this.state.items.list, ...result.list], term };
+          let temp: { term: string; list: any[]; listSummary: BaseListSummary };
+          if (pageCurrent > 1 && items) {
+            temp = { ...result, list: [...items.list, ...result.list], term };
           } else {
-            items = { ...result, term };
+            temp = { ...result, term };
           }
-          this.setState({ items, fetching: false });
+          setItems(temp)
+          setFetching(false)
         } else {
-          this.setState({ fetching: false });
+          setFetching(false)
         }
       });
+    }, [])
   };
+  onPopupScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    popupScroll(e.target as HTMLDivElement);
+  };
+  popupScroll = (target: HTMLDivElement) => {
+    if (items && !fetching && target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      const {
+        term,
+        listSummary: { pageCurrent, totalPages },
+      } = items;
+      if (pageCurrent < totalPages) {
+        this.setState({ fetching: true });
+        this.fetch(term, pageCurrent + 1);
+      }
+    }
+  }
   const onFinish = useCallback(
     (values: FormData) => {
       console.log(8899, values)
